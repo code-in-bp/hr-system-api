@@ -6,7 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -21,14 +23,14 @@ public class HireController {
 
     // get all hires
     @GetMapping("/hires")
-    private List<Hire> findAllHires() {
+    public List<Hire> findAllHires() {
         return hireRepository.findAllHires();
     }
 
 
     // get hire by id
     @GetMapping("/hires/{id}")
-    private ResponseEntity<Hire> findHireById(@PathVariable int id) throws Exception {
+    public ResponseEntity<Hire> findHireById(@PathVariable int id) throws Exception {
         Hire hire = hireRepository.findHiresById(id);
         if(hire == null) {
             // TODO: return not found message
@@ -38,6 +40,34 @@ public class HireController {
     }
 
 
+    // delete hire
+    @DeleteMapping("/hires/{id}")
+    public ResponseEntity<Map<String, Boolean>> deleteHire(@PathVariable int id) {
+        hireRepository.deleteHireById(id);
+        Map<String, Boolean> response = new HashMap<>();
+        return ResponseEntity.ok(response);
+    }
 
+
+    // update hire
+    @PutMapping("/hires/{id}")
+    public ResponseEntity<Hire> updateHire(@PathVariable int id, @RequestBody Hire hireDetails) throws Exception {
+        if(hireRepository.updateHire(new Hire(id, hireDetails.getFirstName(), hireDetails.getLastName(), hireDetails.getEmail(), hireDetails.getHireDate(), hireDetails.getContractType(), hireDetails.getSerialNumber(), hireDetails.getPhoto())) == 0) {
+            throw new Exception("hire id not found");
+        }
+        return ResponseEntity.ok(hireRepository.findHiresById(id));
+    }
+
+
+    // add new hire
+    @PostMapping("/hires")
+    public Hire addNewHire(@RequestBody Hire hire) throws Exception {
+        if(hireRepository.findHiresById(hire.getId()) == null) {
+            int id = hireRepository.addNewHire(hire);
+            return hireRepository.findHiresById(hire.getId());
+        } else {
+            throw new Exception("Hire id already exit");
+        }
+    }
 
 }
