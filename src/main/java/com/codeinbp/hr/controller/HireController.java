@@ -12,6 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1")
+@CrossOrigin("*")
 public class HireController {
 
     private final HireRepository hireRepository;
@@ -62,8 +63,11 @@ public class HireController {
     // add new hire
     @PostMapping("/hires")
     public Hire addNewHire(@RequestBody Hire hire) throws Exception {
+       //TODO: use uuid
+        int id = (int) (Math.random() * 12)+2;
+        hire.setId(id);
         if(hireRepository.findHiresById(hire.getId()) == null) {
-            int id = hireRepository.addNewHire(hire);
+            hireRepository.addNewHire(hire);
             return hireRepository.findHiresById(hire.getId());
         } else {
             throw new Exception("Hire id already exit");
