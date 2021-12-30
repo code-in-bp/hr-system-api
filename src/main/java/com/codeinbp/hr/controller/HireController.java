@@ -2,14 +2,15 @@ package com.codeinbp.hr.controller;
 
 import com.codeinbp.hr.model.Hire;
 import com.codeinbp.hr.repository.HireRepository;
+import com.codeinbp.hr.utils.SearchBySerialNumber;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -78,5 +79,20 @@ public class HireController {
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+
+    @GetMapping("/hires/search/{serialNumber}")
+    public ResponseEntity<String> searchHireBySerialNum(@PathVariable String serialNumber) {
+        try {
+            List<Hire> hires = hireRepository.findAllHires();
+            String searchedHire = SearchBySerialNumber.searchBySerialNumber.apply(serialNumber, hires);
+
+            return ResponseEntity.ok(searchedHire);
+        } catch (Exception e) {
+            return new  ResponseEntity<>("404 not found", HttpStatus.NOT_FOUND);
+        }
+
+
     }
 }
